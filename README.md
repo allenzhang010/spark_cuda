@@ -13,6 +13,10 @@ Test if is working:
 <pre>
 ....
 </pre>
+or
+<pre>
+../../spark-1.3.0/bin/run-example SparkPi
+</pre>
 
 ## Build this project
 <pre>
@@ -23,5 +27,5 @@ sbt eclipse  // for eclipse
 
 ## Run it
 <pre>
-../../spark-1.3.0/bin/spark-submit --class "SimpleApp" --master local[4] target/scala-2.11/spark_cuda_2.11-1.0.0.jar
+../../spark-1.3.0/bin/spark-submit --class "com.yarenty.spark.SimpleApp" --master local[4] target/scala-2.11/spark_cuda_2.11-1.0.0.jar
 </pre>
