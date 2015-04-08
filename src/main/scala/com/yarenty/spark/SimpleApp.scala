@@ -10,7 +10,7 @@ object SimpleApp {
     val logFile = "/opt/spark-1.3.0/README.md" // Should be some file on your system
     val conf = new SparkConf().setAppName("Simple Application")
     val sc = new SparkContext(conf)
-    val logData = sc.textFile(logFile, 2).cache()
+    val logData = sc.textFile(logFile, 1).cache()
     val numAs = logData.filter(line => line.contains("a")).count()
     val numBs = logData.filter(line => line.contains("b")).count()
     println("Lines with a: %s, Lines with b: %s".format(numAs, numBs))
@@ -21,6 +21,14 @@ object SimpleApp {
     val distData = sc.parallelize(data).foreach(x => accum += x)
 
     println("Accumulator: %s".format(accum));
+    
+    // and now lets create 
+    // list of all words and count
+    val wc = logData.flatMap(l => l.split(" ")).map(word => (word, 1)).reduceByKey(_ + _)
+    // and another one
+    val cc = sc.textFile("/opt/spark-1.3.0/CHANGES.txt" , 1).flatMap(l => l.split(" ")).map(word => (word, 1)).reduceByKey(_ + _)
+    
+    wc.join(cc).saveAsTextFile("wc_out.txt")
     
     
   }
