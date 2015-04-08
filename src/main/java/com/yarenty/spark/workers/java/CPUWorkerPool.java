@@ -30,7 +30,7 @@ public class CPUWorkerPool extends AbstractWorkerPool implements WorkerPool {
 	}
 	
 	public WorkerType getWorkerType(){
-		return WorkerType.CUDA;
+		return WorkerType.CPU;
 	}
 
 }

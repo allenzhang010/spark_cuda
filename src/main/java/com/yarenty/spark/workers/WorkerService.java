@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.yarenty.spark.workers.cuda.kernel.CudaMultiplicityKernel;
 import com.yarenty.spark.workers.java.kernel.JavaMultiplicityKernel;
 
-//import static scala.collection.JavaConversions.*;
+import static scala.collection.JavaConversions.*;
 
 /**
  * Main class responsible for CUDA/CPU calculations.
@@ -20,11 +20,11 @@ public class WorkerService {
 	final private WorkerRequestControl wrc;
 
 	//possible options are: CUDA,CPU or MIXED
-	final private WorkerType calculationType = WorkerType.CUDA;
+	final private WorkerType calculationType = WorkerType.CPU;
 	//this is number of processors to use
-	final private int processors = 6;
+	final private int processors = 4;
 	//this is how many GPU devices are in the box
-	final private int gpus = 2;
+	final private int gpus = 1;
 
 	private WorkerService() {
 		LOG.info("Lets game begin.");
@@ -53,10 +53,11 @@ public class WorkerService {
 				WorkerPoolMap.getInstance().initializePools(processors, gpus);
 				LOG.info("Pools initialized");
 
-				wrc.setServiceStart();
+				//wrc.setServiceStart();
 
 				wrc.setAcceptRequests(true);
 
+				wrc.serviceStarted();
 			} catch (Exception e) {
 				LOG.error("Could not initialize workers!", e);
 			}
@@ -75,7 +76,7 @@ public class WorkerService {
 	
 	
 	
-	public Float[] exampleMultiplication(Float[] a, Float[] b) {
+	public <T extends Number> T[] exampleMultiplication(T[] a, T[] b) {
 
 		LOG.info("Accept requests:" + wrc.getAcceptRequest() + " pending:" + wrc.getPendingRequests().get());
 		if (!wrc.getAcceptRequest()) {
@@ -87,9 +88,11 @@ public class WorkerService {
 			}
 		}
 
+		LOG.info("Work in progress");
+		
 		wrc.getPendingRequests().getAndIncrement();
 
-		Float[] out = a; // initialization of output
+		T[] out = a; // initialization of output
 
 		WorkerPool pool = WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CUDA);
 
@@ -101,6 +104,8 @@ public class WorkerService {
 			pool = WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU);
 		}
 
+		LOG.info("POOL in use "+ pool);
+		
 		if (pool != null) {
 			wrc.markWorkerRun(); //if initialization needed
 
@@ -110,6 +115,8 @@ public class WorkerService {
 			worker.setArray(b, "b", GPUType.GLOBAL_MEMORY);
 			worker.setArray(out, "c", GPUType.GLOBAL_MEMORY);
 
+			LOG.info("Kernel initialized");
+			
 			Kernel kernel = null;
 			if (pool.getWorkerType() == WorkerType.CPU) {
 
@@ -118,6 +125,9 @@ public class WorkerService {
 				kernel = new  CudaMultiplicityKernel();
 			}
 			worker.setKernel(kernel);
+
+			LOG.info("RUN!!");
+
 			worker.runKernel();
 
 			out = worker.getArray("c");
@@ -126,7 +136,7 @@ public class WorkerService {
 
 		if (wrc.getPendingRequests().getAndDecrement() == 1) {
 			wrc.setOkToStop();
-			wrc.setServiceStart();
+			//wrc.setServiceStart();
 		}
 
 		return out;

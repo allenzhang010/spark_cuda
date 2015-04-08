@@ -16,6 +16,8 @@ public class JavaMultiplicityKernel implements Kernel {
 		for ( int i= 0; i <a.length; i++) {
 			c[i] = a[i] * b[i];
 		}
+		
+		arrMap.put("c", c);
 
 	}
 

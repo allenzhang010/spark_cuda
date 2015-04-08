@@ -19,11 +19,14 @@ public class WorkerRequestControl {
 		pendingRequests = new AtomicInteger(0);
 		okToStop = new Semaphore(0);
 		firstRunStarted = new AtomicBoolean(false);
+		
+		serviceStart = new CountDownLatch(1);
+
 	}
 	
 	
 	public void setServiceStart() {
-		serviceStart = new CountDownLatch(1);
+//		serviceStart = new CountDownLatch(1);
 	}
 	
 	public void checkServiceStart() throws InterruptedException {
