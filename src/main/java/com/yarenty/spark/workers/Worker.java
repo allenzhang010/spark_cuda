@@ -49,6 +49,10 @@ public interface Worker {
 	public <T extends Number> void setValue(final T val, final String name, final GPUType type);
 
 	
+	
+	public void setKernel(Kernel kernel);
+
+	
 	/**
 	 * To run kernels.
 	 * TODO: kernel args!

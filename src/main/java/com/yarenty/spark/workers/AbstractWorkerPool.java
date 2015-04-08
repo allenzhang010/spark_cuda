@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
-public class AbstractWorkerPool implements WorkerPool {
+public abstract class AbstractWorkerPool implements WorkerPool {
 
 	final static Logger LOG = Logger.getLogger(AbstractWorkerPool.class);
 

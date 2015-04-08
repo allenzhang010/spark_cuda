@@ -15,4 +15,5 @@ public interface WorkerPool {
 
 	boolean canWork();
 
+	WorkerType getWorkerType();
 }

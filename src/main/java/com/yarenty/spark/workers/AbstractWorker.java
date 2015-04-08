@@ -8,6 +8,8 @@ public abstract class AbstractWorker  implements Worker {
 	final static Logger LOG = Logger.getLogger(AbstractWorker.class);
 
 	protected final int id;
+	protected Kernel kernel;
+
 	
 	public AbstractWorker(int id){
 		this.id = id;
@@ -26,4 +28,7 @@ public abstract class AbstractWorker  implements Worker {
 		LOG.info("Cleaning..");
 	}
 
+	public void setKernel(Kernel kernel){
+		this.kernel = kernel;
+	}
 }

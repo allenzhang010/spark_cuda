@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.yarenty.spark.workers.AbstractWorkerPool;
 import com.yarenty.spark.workers.Worker;
 import com.yarenty.spark.workers.WorkerPool;
+import com.yarenty.spark.workers.WorkerType;
 
 /**
  * @author yarenty
@@ -27,4 +28,9 @@ public class CudaWorkerPool extends AbstractWorkerPool implements WorkerPool {
 		addWorkers(workers);
 		
 	}
+	
+	public WorkerType getWorkerType(){
+		return WorkerType.CUDA;
+	}
+	
 }

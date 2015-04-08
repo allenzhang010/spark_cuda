@@ -2,6 +2,9 @@ package com.yarenty.spark.workers;
 
 import org.apache.log4j.Logger;
 
+import com.yarenty.spark.workers.cuda.kernel.CudaMultiplicityKernel;
+import com.yarenty.spark.workers.java.kernel.JavaMultiplicityKernel;
+
 //import static scala.collection.JavaConversions.*;
 
 /**
@@ -68,6 +71,10 @@ public class WorkerService {
 		WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU).prepareStaticData(arr, name, type);
 	}
 
+	
+	
+	
+	
 	public Float[] exampleMultiplication(Float[] a, Float[] b) {
 
 		LOG.info("Accept requests:" + wrc.getAcceptRequest() + " pending:" + wrc.getPendingRequests().get());
@@ -103,6 +110,14 @@ public class WorkerService {
 			worker.setArray(b, "b", GPUType.GLOBAL_MEMORY);
 			worker.setArray(out, "c", GPUType.GLOBAL_MEMORY);
 
+			Kernel kernel = null;
+			if (pool.getWorkerType() == WorkerType.CPU) {
+
+				kernel = new JavaMultiplicityKernel();
+			} else {
+				kernel = new  CudaMultiplicityKernel();
+			}
+			worker.setKernel(kernel);
 			worker.runKernel();
 
 			out = worker.getArray("c");
