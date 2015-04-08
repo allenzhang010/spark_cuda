@@ -15,31 +15,30 @@ import scala.collection.JavaConverters._
 class JavaWorkersTest extends FunSuite {
 
   trait TestWorker {
-    val a = {0.1; 0.3; 10.0; 12.0}
-    val b = {101.1; 30.3; 50.0; 10.0}
-    
-    
+    val a = Array(0.1f, 0.3f, 10.0f, 12.0f)
+    val b = Array(101.1f, 30.3f, 50.0f, 10.0f)
   }
   
     test("check first row") {
     new TestWorker {
-      val service = new WorkerService
+      val service = WorkerService.getInstance
 
       val out = service.exampleMultiplication(
-        a.asJava,
-        b.asJava)
+        a,
+        b)
 
-    val a = {0.1; 0.3; 10.0; 12.0}
+      assert(out.next() === (10.11, 10.1,500.0,120.0))
     }
   }
 
   test("print all") {
     new TestWorker {
-      val alg = new WorkerService
+      val alg = new WorkerService.getInstance
       
-      val out = alg.exampleMultiplication(
+    val out = service.exampleMultiplication(
         a.asJava,
         b.asJava)
+
       out.foreach(println)
     }
   }
