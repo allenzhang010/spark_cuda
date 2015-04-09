@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.yarenty.spark
 
 
@@ -9,14 +6,21 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import com.yarenty.spark.workers.WorkerService
 import scala.collection.JavaConverters._
-import scala.collection.convert.WrapAsJava
+import org.apache.log4j.Logger
+import org.apache.log4j.ConsoleAppender
+import org.apache.log4j.SimpleLayout
+import org.apache.log4j.Level
 
 @RunWith(classOf[JUnitRunner])
 class JavaWorkersTest extends FunSuite {
 
+  val LOG = Logger.getLogger("test")
+  
   trait TestWorker {
+
+    LOG.getParent.addAppender(new ConsoleAppender(new SimpleLayout))
+    LOG.getParent.setLevel(Level.ALL)
     val a: Array[java.lang.Float] = Array(0.1f, 0.3f, 10.0f, 12.0f)
-    
     val b: Array[java.lang.Float] = Array(101.1f, 30.3f, 50.0f, 10.0f)
   }
   
