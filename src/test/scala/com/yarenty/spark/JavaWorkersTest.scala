@@ -15,34 +15,37 @@ import scala.collection.convert.WrapAsJava
 class JavaWorkersTest extends FunSuite {
 
   trait TestWorker {
-    val a = Array(0.1f, 0.3f, 10.0f, 12.0f)
+    val a: Array[java.lang.Float] = Array(0.1f, 0.3f, 10.0f, 12.0f)
     
-    val b = Array(101.1f, 30.3f, 50.0f, 10.0f)
+    val b: Array[java.lang.Float] = Array(101.1f, 30.3f, 50.0f, 10.0f)
   }
   
-    test("check first row") {
+    test("check output row") {
     new TestWorker {
       val service = WorkerService.getInstance
 
-/*      val out = service.exampleMultiplication(
+      val out = service.exampleMultiplication(
         a,
         b
         )
-*/
-//      assert(out.asInstanceOf[Array[Float]]..next() === (10.11, 10.1,500.0,120.0))
+
+      assert(out.toIterator.next() === 10.11f)
+      assert(out(1) === 9.09f)
+      assert(out(2) === 500.0f)
+      assert(out(3) === 120.0f)
     }
   }
 
   test("print all") {
     new TestWorker {
       val service = WorkerService.getInstance
-  /*    
+     
     val out = service.exampleMultiplication(
         a,
         b
         )
-*/
-      //out.foreach(println)
+
+      out.foreach(println)
     }
   }
 
