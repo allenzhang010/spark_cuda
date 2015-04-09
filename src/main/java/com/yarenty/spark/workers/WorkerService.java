@@ -19,11 +19,11 @@ public class WorkerService {
 
 	final private WorkerRequestControl wrc;
 
-	//possible options are: CUDA,CPU or MIXED
+	// possible options are: CUDA,CPU or MIXED
 	final private WorkerType calculationType = WorkerType.CPU;
-	//this is number of processors to use
+	// this is number of processors to use
 	final private int processors = 4;
-	//this is how many GPU devices are in the box
+	// this is how many GPU devices are in the box
 	final private int gpus = 1;
 
 	private WorkerService() {
@@ -49,11 +49,12 @@ public class WorkerService {
 			try {
 				LOG.info(">New life is started.");
 
-				//TODO: how to get number of processors and number of GPU automatically!!
+				// TODO: how to get number of processors and number of GPU
+				// automatically!!
 				WorkerPoolMap.getInstance().initializePools(processors, gpus);
 				LOG.info("Pools initialized");
 
-				//wrc.setServiceStart();
+				// wrc.setServiceStart();
 
 				wrc.setAcceptRequests(true);
 
@@ -67,18 +68,17 @@ public class WorkerService {
 	public <T extends Number> void prepareStaticData(final T[] arr,
 			final String name, final GPUType type) {
 		LOG.info("prepare all CUDA");
-		WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CUDA).prepareStaticData(arr, name, type);
+		WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CUDA)
+				.prepareStaticData(arr, name, type);
 		LOG.info("prepare all CPU");
-		WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU).prepareStaticData(arr, name, type);
+		WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU)
+				.prepareStaticData(arr, name, type);
 	}
 
-	
-	
-	
-	
 	public <T extends Number> T[] exampleMultiplication(T[] a, T[] b) {
 
-		LOG.info("Accept requests:" + wrc.getAcceptRequest() + " pending:" + wrc.getPendingRequests().get());
+		LOG.info("Accept requests:" + wrc.getAcceptRequest() + " pending:"
+				+ wrc.getPendingRequests().get());
 		if (!wrc.getAcceptRequest()) {
 			try {
 				wrc.checkServiceStart();
@@ -89,12 +89,13 @@ public class WorkerService {
 		}
 
 		LOG.info("Work in progress");
-		
+
 		wrc.getPendingRequests().getAndIncrement();
 
 		T[] out = a; // initialization of output
 
-		WorkerPool pool = WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CUDA);
+		WorkerPool pool = WorkerPoolMap.getInstance().getWorkerPool(
+				WorkerType.CUDA);
 
 		if (!pool.canWork() && calculationType == WorkerType.MIXED) {
 			pool = WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU);
@@ -104,29 +105,30 @@ public class WorkerService {
 			pool = WorkerPoolMap.getInstance().getWorkerPool(WorkerType.CPU);
 		}
 
-		LOG.info("POOL in use "+ pool);
-		
+		LOG.info("POOL in use: " + pool);
+
 		if (pool != null) {
-			wrc.markWorkerRun(); //if initialization needed
+			wrc.markWorkerRun(); // if initialization needed
 
 			Worker worker = pool.getWorker();
 
+			LOG.info("Worker[" + worker.getID() + "]:: " + worker);
 			worker.setArray(a, "a", GPUType.GLOBAL_MEMORY);
 			worker.setArray(b, "b", GPUType.GLOBAL_MEMORY);
 			worker.setArray(out, "c", GPUType.GLOBAL_MEMORY);
 
-			LOG.info("Kernel initialized");
-			
+			LOG.info("Worker[" + worker.getID() + "]:: Kernel initialized");
+
 			Kernel kernel = null;
 			if (pool.getWorkerType() == WorkerType.CPU) {
 
 				kernel = new JavaMultiplicityKernel();
 			} else {
-				kernel = new  CudaMultiplicityKernel();
+				kernel = new CudaMultiplicityKernel();
 			}
 			worker.setKernel(kernel);
 
-			LOG.info("RUN!!");
+			LOG.info("Worker[" + worker.getID() + "]:: RUN!!");
 
 			worker.runKernel();
 
@@ -136,7 +138,7 @@ public class WorkerService {
 
 		if (wrc.getPendingRequests().getAndDecrement() == 1) {
 			wrc.setOkToStop();
-			//wrc.setServiceStart();
+			// wrc.setServiceStart();
 		}
 
 		return out;
