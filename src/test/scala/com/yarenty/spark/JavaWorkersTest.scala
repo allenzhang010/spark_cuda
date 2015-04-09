@@ -33,6 +33,9 @@ class JavaWorkersTest extends FunSuite {
       assert(out(1) === 9.09f)
       assert(out(2) === 500.0f)
       assert(out(3) === 120.0f)
+      //or simply:
+      assert(out === Array(10.11f, 9.09f, 500.0f,120.0f))
+      
     }
   }
 
